@@ -1,0 +1,35 @@
+{
+  "name": "inventario-dashboard-lalalou",
+  "version": "1.0.0",
+  "description": "Dashboard interactivo de inventario para Lalalou - Temporada Invierno 2026",
+  "main": "serve.js",
+  "scripts": {
+    "start": "node serve.js",
+    "dev": "node serve.js 3000",
+    "serve": "node serve.js 8080",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "keywords": [
+    "dashboard",
+    "inventory",
+    "analytics",
+    "lalalou",
+    "retail",
+    "management"
+  ],
+  "author": "Equipo AV Capital",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/av-capital/inventario-dashboard"
+  },
+  "bugs": {
+    "url": "https://github.com/av-capital/inventario-dashboard/issues"
+  },
+  "homepage": "https://github.com/av-capital/inventario-dashboard#readme"
+}

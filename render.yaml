@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: inventario-lalalou
+    env: static
+    buildCommand: ""
+    startCommand: ""
+    staticPublishPath: .
+    headers:
+      - path: /*
+        name: Access-Control-Allow-Origin
+        value: "*"
+      - path: /*
+        name: Cache-Control
+        value: "public, max-age=3600"
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

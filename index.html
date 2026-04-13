@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Dashboard Interactivo - Inventario Lalalou</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <!-- SheetJS para exportación -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- PDFMake -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --danger-color: #dc2626;
+            --warning-color: #d97706;
+            --success-color: #059669;
+        }
+        
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .critical-badge {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        
+        .filter-active {
+            background-color: #3b82f6 !important;
+            color: white !important;
+        }
+        
+        .status-critical { border-left: 4px solid #dc2626; }
+        .status-warning { border-left: 4px solid #d97706; }
+        .status-good { border-left: 4px solid #059669; }
+        .status-neutral { border-left: 4px solid #6b7280; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <!-- Header -->
+    <header class="bg-white shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center mb-4 md:mb-0">
+                    <div class="bg-blue-100 text-blue-600 rounded-full p-3 mr-4">
+                        <i class="fas fa-chart-line text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">📊 Dashboard Interactivo de Inventario</h1>
+                        <p class="text-gray-600">Lalalou - Temporada Invierno 2026</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <div class="text-right">
+                        <p class="text-sm text-gray-500">Última actualización</p>
+                        <p class="font-semibold" id="last-update">06 de Abril 2026</p>
+                    </div>
+                    <button onclick="exportToPDF()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center">
+                        <i class="fas fa-file-pdf mr-2"></i> PDF
+                    </button>
+                    <button onclick="exportToExcel()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center">
+                        <i class="fas fa-file-excel mr-2"></i> Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- Alert Banner -->
+        <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-8">
+            <div class="flex items-center">
+                <div class="critical-badge bg-red-500 text-white rounded-full p-2 mr-4">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-bold text-red-800">🚨 ALERTA: STOCK CRÍTICO DETECTADO</h3>
+                    <p class="text-red-700">5 productos tienen menos de 1 semana de stock. Acción inmediata requerida.</p>
+                </div>
+                <button onclick="scrollToCritical()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg">
+                    Ver productos críticos
+                </button>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <h3 class="text-lg font-bold mb-4 text-gray-800"><i class="fas fa-filter mr-2"></i>Filtros</h3>
+            <div class="flex flex-wrap gap-3">
+                <button onclick="filterByStatus('all')" class="filter-btn filter-active bg-blue-100 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-200">
+                    Todos
+                </button>
+                <button onclick="filterByStatus('critical')" class="filter-btn bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200">
+                    <i class="fas fa-fire mr-1"></i> Crítico
+                </button>
+                <button onclick="filterByStatus('warning')" class="filter-btn bg-orange-100 text-orange-700 px-4 py-2 rounded-lg hover:bg-orange-200">
+                    <i class="fas fa-exclamation-triangle mr-1"></i> Advertencia
+                </button>
+                <button onclick="filterByStatus('good')" class="filter-btn bg-green-100 text-green-700 px-4 py-2 rounded-lg hover:bg-green-200">
+                    <i class="fas fa-check-circle mr-1"></i> Bueno
+                </button>
+                <button onclick="filterByCategory('jeans')" class="filter-btn bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200">
+                    👖 Jeans
+                </button>
+                <button onclick="filterByCategory('blazers')" class="filter-btn bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200">
+                    🧥 Blazers
+                </button>
+                <button onclick="filterByCategory('pants')" class="filter-btn bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200">
+                    👖 Pantalones
+                </button>
+                <div class="ml-auto">
+                    <input type="text" id="search-input" placeholder="Buscar producto..." 
+                           class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Stock Total -->
+            <div class="card bg-white rounded-xl shadow-lg p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Stock Disponible</p>
+                        <p class="text-3xl font-bold text-gray-900">802</p>
+                        <p class="text-gray-600">unidades</p>
+                    </div>
+                    <div class="text-blue-500 text-3xl">
+                        <i class="fas fa-boxes"></i>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="flex justify-between text-sm">
+                        <span>Producción total: 1,100</span>
+                        <span class="font-semibold">73% disponible</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
+                        <div class="bg-blue-600 h-2 rounded-full" style="width: 73%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ventas Semanales -->
+            <div class="card bg-white rounded-xl shadow-lg p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Ventas Semanales</p>
+                        <p class="text-3xl font-bold text-red-600">298</p>
+                        <p class="text-gray-600">unidades/sem</p>
+                    </div>
+                    <div class="text-green-500 text-3xl">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="flex justify-between text-sm">
+                        <span>Ritmo actual</span>
+                        <span class="font-semibold text-red-600">Alto</span>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-1">27% del stock semanal</div>
+                </div>
+            </div>
+
+            <!-- Semanas Restantes -->
+            <div class="card status-critical bg-white rounded-xl shadow-lg p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Semanas de Stock</p>
+                        <p class="text-3xl font-bold text-red-700">2.7</p>
+                        <p class="text-gray-600">hasta agotamiento</p>
+                    </div>
+                    <div class="text-red-500 text-3xl">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="flex justify-between text-sm">
+                        <span>Proyección</span>
+                        <span class="font-semibold text-red-700">~25 Abril</span>
+                    </div>
+                    <div class="text-xs text-red-600 mt-1">¡Acción requerida!</div>
+                </div>
+            </div>
+
+            <!-- Tallas Agotadas -->
+            <div class="card bg-white rounded-xl shadow-lg p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Tallas Agotadas</p>
+                        <p class="text-3xl font-bold text-orange-600">42</p>
+                        <p class="text-gray-600">de 298 (14%)</p>
+                    </div>
+                    <div class="text-orange-500 text-3xl">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="flex justify-between text-sm">
+                        <span>Tallas críticas</span>
+                        <span class="font-semibold">18</span>
+                    </div>
+                    <div class="text-xs text-orange-600 mt-1">≤1 semana de stock</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Ventas por Categoría -->
+            <div class="card bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-lg font-bold mb-4 text-gray-800">
+                    <i class="fas fa-chart-pie mr-2"></i>Ventas por Categoría
+                </h3>
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+                <div class="mt-4 text-sm text-gray-600">
+                    <p><i class="fas fa-info-circle mr-2"></i>Los Jeans lideran con 15.1% de las ventas semanales</p>
+                </div>
+            </div>
+
+            <!-- Proyección de Stock -->
+            <div class="card bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-lg font-bold mb-4 text-gray-800">
+                    <i class="fas fa-chart-line mr-2"></i>Proyección de Stock
+                </h3>
+                <div class="chart-container">
+                    <canvas id="projectionChart"></canvas>
+                </div>
+                <div class="mt-4 text-sm text-gray-600">
+                    <p><i class="fas fa-calendar-alt mr-2"></i>Stock se agotará alrededor del 25 de Abril</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Productos Críticos -->
+        <div class="card bg-white rounded-xl shadow-lg p-6 mb-8" id="critical-section">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-bold text-gray-800">
+                    <i class="fas fa-fire mr-2 text-red-500"></i>Productos con Stock Crítico
+                </h3>
+                <div class="flex items-center space-x-2">
+                    <span class="text-sm text-gray-500">Mostrar:</span>
+                    <select id="rows-per-page" class="border border-gray-300 rounded-lg px-3 py-1">
+                        <option value="10">10 filas</option>
+                        <option value="25">25 filas</option>
+                        <option value="50">50 filas</option>
+                        <option value="100">100 filas</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table id="critical-table" class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Producto
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Categoría
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Talla
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Stock
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Ventas/Sem
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Semanas
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Estado
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Acciones
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body" class="bg-white divide-y divide-gray-200">
+                        <!-- Los datos se cargarán con JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="mt-4 flex justify-between items-center">
+                <div class="text-sm text-gray-500" id="table-info">
+                    Mostrando 0 de 0 productos
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="previousPage()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button onclick="nextPage()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tendencias y Análisis -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            <!-- Top Productos -->
+            <div class="card bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-lg font-bold mb-4 text-gray-800">
+                    <i class="fas fa-trophy mr-2 text-yellow-500"></i>Top 5 Productos
+                </h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                        <div class="flex items-center">
+                            <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3">1</span>
+                            <span class="font-medium">JEANS PITILLO ICON</span>
+                        </div>
+                        <span class="

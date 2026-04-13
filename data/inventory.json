@@ -1,0 +1,324 @@
+{
+  "metadata": {
+    "company": "Lalalou",
+    "season": "Invierno 2026",
+    "reportDate": "2026-04-06",
+    "analysisPeriod": "2026-03-30 to 2026-04-06",
+    "generatedAt": "2026-04-13T13:50:00Z"
+  },
+  
+  "summary": {
+    "totalStock": 802,
+    "weeklySales": 298,
+    "weeksRemaining": 2.7,
+    "outOfStockSizes": 42,
+    "totalSizes": 298,
+    "totalProduced": 1100,
+    "criticalSizes": 18,
+    "missingUnits": 65,
+    "stockHealth": "critical",
+    "projectedDepletionDate": "2026-04-25"
+  },
+  
+  "categories": [
+    {
+      "id": "jeans",
+      "name": "Jeans",
+      "sales": 45,
+      "percentage": 15.1,
+      "produced": 280,
+      "outOfStock": 8,
+      "color": "#3b82f6",
+      "trend": "up"
+    },
+    {
+      "id": "blazers",
+      "name": "Blazers y Chaquetas",
+      "sales": 38,
+      "percentage": 12.8,
+      "produced": 220,
+      "outOfStock": 6,
+      "color": "#8b5cf6",
+      "trend": "up"
+    },
+    {
+      "id": "pants",
+      "name": "Pantalones",
+      "sales": 32,
+      "percentage": 10.7,
+      "produced": 180,
+      "outOfStock": 5,
+      "color": "#10b981",
+      "trend": "stable"
+    },
+    {
+      "id": "poleras",
+      "name": "Poleras",
+      "sales": 28,
+      "percentage": 9.4,
+      "produced": 150,
+      "outOfStock": 4,
+      "color": "#f59e0b",
+      "trend": "stable"
+    },
+    {
+      "id": "coats",
+      "name": "Abrigos",
+      "sales": 25,
+      "percentage": 8.4,
+      "produced": 120,
+      "outOfStock": 3,
+      "color": "#ef4444",
+      "trend": "up"
+    },
+    {
+      "id": "blouses",
+      "name": "Blusas y Camisas",
+      "sales": 22,
+      "percentage": 7.4,
+      "produced": 100,
+      "outOfStock": 3,
+      "color": "#ec4899",
+      "trend": "down"
+    },
+    {
+      "id": "dresses",
+      "name": "Vestidos y Polleras",
+      "sales": 12,
+      "percentage": 4.0,
+      "produced": 50,
+      "outOfStock": 2,
+      "color": "#14b8a6",
+      "trend": "stable"
+    }
+  ],
+  
+  "criticalProducts": [
+    {
+      "id": 1,
+      "sku": "LP-2026-001",
+      "name": "PANTALON BOLOGNA TERCIOPELO CHOCOLATE",
+      "category": "Pantalones",
+      "subcategory": "Pantalones Formales",
+      "size": "38",
+      "stock": 1,
+      "weeklySales": 5,
+      "weeksRemaining": 0.2,
+      "status": "critical",
+      "barcode": "77383340940927",
+      "price": 89990,
+      "cost": 45000,
+      "margin": 49.9,
+      "notes": "Stock extremadamente bajo. Reposición URGENTE.",
+      "lastRestocked": "2026-03-20",
+      "reorderPoint": 10,
+      "reorderQuantity": 20,
+      "priority": 1
+    },
+    {
+      "id": 2,
+      "sku": "LP-2026-002",
+      "name": "BLAZER WAIST TERCIOPELO CHOCOLATE",
+      "category": "Blazers y Chaquetas",
+      "subcategory": "Blazers",
+      "size": "38",
+      "stock": 1,
+      "weeklySales": 3,
+      "weeksRemaining": 0.3,
+      "status": "critical",
+      "barcode": "77383341493803",
+      "price": 129990,
+      "cost": 65000,
+      "margin": 50.0,
+      "notes": "Producto top ventas. Talla 34 ya agotada.",
+      "lastRestocked": "2026-03-25",
+      "reorderPoint": 8,
+      "reorderQuantity": 15,
+      "priority": 1
+    },
+    {
+      "id": 3,
+      "sku": "LP-2026-003",
+      "name": "PANTALON LALALOU GABARDINA NEGRA",
+      "category": "Pantalones",
+      "subcategory": "Pantalones Casual",
+      "size": "38",
+      "stock": 2,
+      "weeklySales": 4,
+      "weeksRemaining": 0.5,
+      "status": "warning",
+      "barcode": "77383340977367",
+      "price": 79990,
+      "cost": 40000,
+      "margin": 50.0,
+      "notes": "Stock bajo. Considerar reposición.",
+      "lastRestocked": "2026-03-28",
+      "reorderPoint": 6,
+      "reorderQuantity": 12,
+      "priority": 2
+    },
+    {
+      "id": 4,
+      "sku": "LP-2026-004",
+      "name": "BLAZER WAIST TWEED",
+      "category": "Blazers y Chaquetas",
+      "subcategory": "Blazers",
+      "size": "38",
+      "stock": 3,
+      "weeklySales": 4,
+      "weeksRemaining": 0.8,
+      "status": "warning",
+      "barcode": "77383341541245",
+      "price": 119990,
+      "cost": 60000,
+      "margin": 50.0,
+      "notes": "Ventas consistentes. Stock disminuyendo.",
+      "lastRestocked": "2026-03-22",
+      "reorderPoint": 8,
+      "reorderQuantity": 16,
+      "priority": 2
+    },
+    {
+      "id": 5,
+      "sku": "LP-2026-005",
+      "name": "JEANS PITILLO ICON",
+      "category": "Jeans",
+      "subcategory": "Jeans Ajustados",
+      "size": "32",
+      "stock": 4,
+      "weeklySales": 4,
+      "weeksRemaining": 1.0,
+      "status": "warning",
+      "barcode": "77383341732627",
+      "price": 69990,
+      "cost": 35000,
+      "margin": 50.0,
+      "notes": "Producto #1 en ventas. Tallas 34 y 38 agotadas.",
+      "lastRestocked": "2026-03-15",
+      "reorderPoint": 10,
+      "reorderQuantity": 25,
+      "priority": 1
+    }
+  ],
+  
+  "topProducts": [
+    {
+      "rank": 1,
+      "name": "JEANS PITILLO ICON",
+      "sales": 18,
+      "percentage": 6.0,
+      "category": "Jeans",
+      "trend": "up",
+      "growth": 12.5
+    },
+    {
+      "rank": 2,
+      "name": "BLAZER WAIST TERCIOPELO CHOCOLATE",
+      "sales": 12,
+      "percentage": 4.0,
+      "category": "Blazers y Chaquetas",
+      "trend": "up",
+      "growth": 20.0
+    },
+    {
+      "rank": 3,
+      "name": "PANTALON BOLOGNA TERCIOPELO CHOCOLATE",
+      "sales": 10,
+      "percentage": 3.4,
+      "category": "Pantalones",
+      "trend": "stable",
+      "growth": 0.0
+    },
+    {
+      "rank": 4,
+      "name": "PANTALON LALALOU GABARDINA NEGRA",
+      "sales": 9,
+      "percentage": 3.0,
+      "category": "Pantalones",
+      "trend": "up",
+      "growth": 28.6
+    },
+    {
+      "rank": 5,
+      "name": "BLAZER WAIST TWEED",
+      "sales": 8,
+      "percentage": 2.7,
+      "category": "Blazers y Chaquetas",
+      "trend": "stable",
+      "growth": 0.0
+    }
+  ],
+  
+  "stockProjection": [
+    { "date": "2026-04-06", "stock": 802, "sales": 298 },
+    { "date": "2026-04-13", "stock": 504, "sales": 298 },
+    { "date": "2026-04-20", "stock": 206, "sales": 298 },
+    { "date": "2026-04-27", "stock": 0, "sales": 206 }
+  ],
+  
+  "alerts": [
+    {
+      "id": 1,
+      "type": "critical",
+      "title": "Stock Crítico Detectado",
+      "message": "5 productos tienen menos de 1 semana de stock",
+      "timestamp": "2026-04-13T13:00:00Z",
+      "actionRequired": true
+    },
+    {
+      "id": 2,
+      "type": "warning",
+      "title": "Discrepancias de Inventario",
+      "message": "65 unidades faltantes no explicadas por ventas",
+      "timestamp": "2026-04-13T12:30:00Z",
+      "actionRequired": true
+    },
+    {
+      "id": 3,
+      "type": "info",
+      "title": "Tallas Agotadas",
+      "message": "42 tallas (14%) sin stock disponible",
+      "timestamp": "2026-04-13T12:00:00Z",
+      "actionRequired": false
+    }
+  ],
+  
+  "recommendations": [
+    {
+      "priority": 1,
+      "title": "Reposición Inmediata",
+      "description": "Reponer productos con ≤1 semana de stock",
+      "products": [1, 2, 3, 4, 5],
+      "estimatedCost": 2500000,
+      "estimatedTime": "3-5 días",
+      "impact": "Alto"
+    },
+    {
+      "priority": 2,
+      "title": "Auditoría de Bodega",
+      "description": "Verificar 65 unidades faltantes",
+      "products": [],
+      "estimatedCost": 0,
+      "estimatedTime": "2 días",
+      "impact": "Medio"
+    },
+    {
+      "priority": 3,
+      "title": "Ajuste de Producción",
+      "description": "Aumentar producción de top 3 productos",
+      "products": [1, 2, 5],
+      "estimatedCost": 5000000,
+      "estimatedTime": "7-10 días",
+      "impact": "Alto"
+    }
+  ],
+  
+  "performanceMetrics": {
+    "sellThroughRate": 27.1,
+    "grossMargin": 50.0,
+    "inventoryTurnover": 4.2,
+    "stockoutRate": 14.1,
+    "forecastAccuracy": 85.3,
+    "reorderEfficiency": 72.8
+  }
+}
