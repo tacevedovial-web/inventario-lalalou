@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Dashboard Inteligente - Inventario Lalalou</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        
+        /* Animaciones */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+        
+        .animate-fade-in { animation: fadeIn 0.5s ease-out; }
+        .animate-pulse { animation: pulse 2s infinite; }
+        
+        /* Cards */
+        .card { background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); transition: all 0.3s ease; }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        
+        /* Badges */
+        .badge { display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .badge-critical { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
+        .badge-warning { background: #fef3c7; color: #d97706; border: 1px solid #fde68a; }
+        .badge-success { background: #d1fae5; color: #059669; border: 1px solid #a7f3d0; }
+        
+        /* Botones */
+        .btn { display: inline-flex; align-items: center; padding: 10px 20px; border-radius: 8px; font-weight: 600; transition: all 0.3s ease; cursor: pointer; border: none; gap: 8px; }
+        .btn-primary { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(59,130,246,0.3); }
+        .btn-secondary { background: white; color: #3b82f6; border: 2px solid #3b82f6; }
+        .btn-secondary:hover { background: #3b82f6; color: white; }
+        
+        /* Tablas */
+        .table-container { overflow-x: auto; border-radius: 8px; border: 1px solid #e2e8f0; }
+        .table { width: 100%; border-collapse: collapse; }
+        .table th { background: #f8fafc; padding: 12px; text-align: left; font-weight: 600; color: #475569; border-bottom: 2px solid #e2e8f0; }
+        .table td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
+        .table tr:hover { background: #f8fafc; }
+        
+        /* Progress bars */
+        .progress-bar { height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; border-radius: 3px; }
+        .progress-critical { background: linear-gradient(90deg, #ef4444, #dc2626); }
+        .progress-warning { background: linear-gradient(90deg, #f59e0b, #d97706); }
+        .progress-good { background: linear-gradient(90deg, #10b981, #059669); }
+        
+        /* Tabs */
+        .tabs { display: flex; border-bottom: 2px solid #e2e8f0; gap: 4px; }
+        .tab { padding: 12px 24px; background: transparent; border: none; color: #64748b; font-weight: 600; cursor: pointer; position: relative; }
+        .tab:hover { color: #3b82f6; }
+        .tab.active { color: #3b82f6; }
+        .tab.active::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 2px; background: #3b82f6; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-3 rounded-xl">
+                        <i class="fas fa-chart-bar text-white text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">Dashboard Inteligente</h1>
+                        <p class="text-gray-600 text-sm">
+                            Inventario Lalalou • Temporada Invierno 2026
+                            <span class="ml-3 badge badge-critical animate-pulse">
+                                <i class="fas fa-exclamation-triangle mr-1"></i>SITUACIÓN CRÍTICA
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="exportData('excel')" class="btn btn-secondary">
+                        <i class="fas fa-file-excel"></i> Excel
+                    </button>
+                    <button onclick="exportData('pdf')" class="btn btn-secondary">
+                        <i class="fas fa-file-pdf"></i> PDF
+                    </button>
+                    <button onclick="refreshDashboard()" class="btn btn-primary">
+                        <i class="fas fa-sync-alt"></i> Actualizar
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Tabs -->
+            <div class="mt-6 tabs">
+                <button class="tab active" onclick="switchTab('overview')">
+                    <i class="fas fa-home mr-2"></i>Resumen
+                </button>
+                <button class="tab" onclick="switchTab('products')">
+                    <i class="fas fa-boxes mr-2"></i>Productos
+                </button>
+                <button class="tab" onclick="switchTab('analytics')">
+                    <i class="fas fa-chart-line mr-2"></i>Análisis
+                </button>
+                <button class="tab" onclick="switchTab('actions')">
+                    <i class="fas fa-bolt mr-2"></i>Acciones
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <!-- Alerta crítica -->
+        <div class="bg-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded-xl p-6 mb-6 animate-fade-in">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-fire text-red-600 text-2xl"></i>
+                </div>
+                <div class="ml-4 flex-1">
+                    <h3 class="text-lg font-bold text-red-800 mb-2">¡ACCIÓN INMEDIATA REQUERIDA!</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="flex items-center">
+                            <div class="bg-red-100 p-3 rounded-lg mr-3">
+                                <i class="fas fa-clock text-red-600"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-red-700">2.7 semanas</p>
+                                <p class="text-sm text-red-600">Hasta agotamiento total</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="bg-red-100 p-3 rounded-lg mr-3">
+                                <i class="fas fa-exclamation-circle text-red-600"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-red-700">5 productos</p>
+                                <p class="text-sm text-red-600">Con stock crítico (≤1 semana)</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="bg-red-100 p-3 rounded-lg mr-3">
+                                <i class="fas fa-search text-red-600"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-red-700">65 unidades</p>
+                                <p class="text-sm text-red-600">Faltantes sin explicación</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <button onclick="showCriticalActions()" class="btn btn-primary">
+                            <i class="fas fa-bolt mr-2"></i>Ver acciones urgentes
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estadísticas principales -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="card animate-fade-in" style="animation-delay: 0.1s">
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Stock Total</p>
+                            <p class="text-3xl font-bold text-gray-900 mt-2">802</p>
+                        </div>
+                        <div class="bg-blue-100 p-3 rounded-lg">
+                            <i class="fas fa-box text-blue-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill progress-warning" style="width: 73%"></div>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-2">73% del inventario inicial</p>
+                </div>
+            </div>
+
+            <div class="card animate-fade-in" style="animation-delay: 0.2s">
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Ventas Semanales</p>
+                            <p class="text-3xl font-bold text-red-600 mt-2">298</p>
+                        </div>
+                        <div class="bg-red-100 p-3 rounded-lg">
+                            <i class="fas fa-chart-line text-red-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill progress-critical" style="width: 85%"></div>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-2">Ritmo ALTO de ventas</p>
+                </div>
+            </div>
+
+            <div class="card animate-fade-in" style="animation-delay: 0.3s">
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Semanas Restantes</p>
+                            <p class="text-3xl font-bold text-yellow-600 mt-2">2.7</p>
+                        </div>
+                        <div class="bg-yellow-100 p-3 rounded-lg">
+                            <i class="fas fa-hourglass-half text-yellow-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill progress-critical" style="width: 38%"></div>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-2">Hasta ~25 Abril 2026</p>
+                </div>
+            </div>
+
+            <div class="card animate-fade-in" style="animation-delay: 0.4s">
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Productos Críticos</p>
+                            <p class="text-3xl font-bold text-red-700 mt-2">5</p>
+                        </div>
+                        <div class="bg-red-100 p-3 rounded-lg">
+                            <i class="fas fa-exclamation-circle text-red-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill progress-critical" style="width: 100%"></div>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-2">Reposición URGENTE</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenido dinámico -->
+        <div id="tab-content">
+            <!-- Tab Resumen (default) -->
+            <div id="overview-tab" class="tab-content active">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Top productos más vendidos -->
+                    <div class="card">
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                                    <i class="fas fa-trophy text-yellow-500"></i>
+                                    Top 10 Productos Más Vendidos
+                                </h2>
+                                <button onclick="sortBySales('desc')" class="btn btn-secondary text-sm">
+                                    <i class="fas fa-sort-amount-down mr-1"></i>Ordenar
+                                </button>
+                            </div>
+                            
+                            <div class="table-container">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Ventas/Sem</th>
+                                            <th>Stock</th>
+                                            <th>Semanas</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="top-products-table">
+                                        <!-- Datos cargados por JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gráfico de proyección -->
+                    <div class="card">
+                        <div class="p-6">
+                            <h2 class="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+                                <i class="fas fa-chart-line text-blue-500"></i>
+                                Proyección de Agotamiento
+                            </h2>
+                            
+                            <div style="height: 300px;">
+                                <canvas id="projectionChart"></canvas>
+                            </div>
+                            
+                            <div class="mt-6 p-4 bg-red-50 rounded-lg border border-red-100">
+                                <p class="text-sm text-red-700 font-medium">
+                                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                                    ¡ALERTA! Stock se agotará en <span class="font-bold">2.7 semanas</span> al ritmo actual.
+                                </p>
+                                <p class="text-sm text-red-600 mt-1">
+                                    Fecha estimada: <span class="font-bold">~25 Abril 2026</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Productos menos vendidos -->
+                    <div class="card lg:col-span-2">
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                                    <i class="fas fa-chart-bar text-purple-500"></i>
+                                    Productos con Baja Rotación
+                                </h2>
+                                <div class="flex gap-2">
+                                    <button onclick="showLowSelling()" class="btn btn-secondary text-sm">
+                                        <i class="fas fa-filter mr-1"></i>Filtrar
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="table-container">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Categoría</th>
+                                            <th>Stock</th>
+                                            <th>Ventas/Sem</th>
+                                            <th>Semanas Stock</th>
+                                            <th>Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="low-products-table">
+                                        <!-- Datos cargados por JavaScript -->
+                                    </tbody>
+                                </
